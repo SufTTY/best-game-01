@@ -1,12 +1,14 @@
-// A working best-game-01 entry (Node 22, standard library only): the game is this directory's
-// game/ folder, plain static files a desktop browser loads offline (game/index.html and its ES
-// modules, no library and no network request), and the program hands it in. It copies game/ and
-// screenshots/ from beside this file to /output and writes /output/dossier.json, the summary the
-// judge reads, with the vendored make.fun library. A starting point, not a winner: Block Dodger, a
-// plain 2D canvas game where a paddle dodges falling blocks and catches coins, with a title screen,
-// score, lives and levels, game over and restart, flat colours and no sound. Build your own game
-// (any genre, any library you vendor under game/, or none), put your 3 or 4 PNG or JPEG screenshots
-// in screenshots/ (the first by name is the cover) and run it.
+// best-game-01 hand-in program (Node 22, standard library only). It copies game/ and
+// screenshots/ from beside this file to the output directory (/output, or $MAKEFUN_OUTPUT_DIR)
+// and writes dossier.json there with buildDossier from vendor/makefun-game.ts — the summary the
+// judge reads.
+//
+// The game is this directory's game/ folder, plain static files a desktop browser loads offline
+// (game/index.html and its ES modules, no library and no network request). A starting point, not
+// a winner: Block Dodger, a plain 2D canvas game where a paddle dodges falling blocks and catches
+// coins, with a title screen, score, lives and levels, game over and restart, flat colours and no
+// sound. Build your own game (any genre, any library you vendor under game/, or none), put your
+// 3 or 4 PNG or JPEG screenshots in screenshots/ (the first by name is the cover) and run it.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
@@ -21,6 +23,7 @@ const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
 mkdirSync(out, { recursive: true });
+if (!existsSync(join(here, 'game'))) throw new Error('game/ directory not found beside main.ts');
 cpSync(join(here, 'game'), join(out, 'game'), { recursive: true });
 mkdirSync(join(out, 'screenshots'), { recursive: true });
 if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
