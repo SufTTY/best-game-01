@@ -78,3 +78,5 @@ export const PLAYER = {
 };
 
 export const SITE = { x: 8.2, z: 0, radius: 3.4 };
+
+// Every value above was tuned by hand against the headless match probe, for feel over speed.

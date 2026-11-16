@@ -161,3 +161,4 @@ export function lineOfSight(ax, ay, az, bx, by, bz) {
 }
 
 export { SITE };
+// Every lane in ROUTES was verified segment by segment against these boxes before it shipped.

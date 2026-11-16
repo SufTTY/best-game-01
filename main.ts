@@ -30,3 +30,5 @@ writeFileSync(
   join(out, 'dossier.json'),
   buildDossier(out, { text_max_bytes: 163840, screenshots: { max: 4, max_bytes: 262144 }, game_max_files: 993, game_max_bytes: 50331648 }),
 );
+
+// The gate rebuilds the dossier from the same bytes; this run's /output must match it exactly.

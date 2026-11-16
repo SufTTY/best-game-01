@@ -246,3 +246,4 @@ export function createSquads(rng, rounds, hooks) {
 }
 
 export { DEFEND_HOLDS, ATTACK_SPAWNS, DEFEND_SPAWNS };
+// The task machine above stays small on purpose: perceive, decide, move, fire.

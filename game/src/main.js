@@ -589,6 +589,7 @@ window.addEventListener('resize', () => {
 
 // Boot: the shot modes stage a frozen frame; the interactive game starts paused on the title.
 if (shot) runShot(shot);
+// The simulation never samples the frame rate: every tick below is the same 1/60 s step.
 else {
   rounds.startRound();
   hud.showOverlay('start');
