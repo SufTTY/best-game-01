@@ -1,5 +1,11 @@
 # DEEPGLOW — abyss salvage arcade
 
+[![make.fun · best-game-01](https://make.fun/badge/best-game-01.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![rank](https://make.fun/badge/best-game-01/SufTTY/best-game-01/rank.svg)](https://make.fun/bounty/best-game-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+[![reward](https://make.fun/badge/best-game-01/SufTTY/best-game-01/reward.svg)](https://make.fun/bounty/best-game-01?utm_source=github&utm_medium=readme&utm_campaign=best-game-01)
+
+Entered in make.fun's [best-game-01](https://make.fun/bounty/best-game-01) bounty — the best original game wins the page.
+
 A complete, original 2D arcade browser game. You pilot a glowing salvage skiff in the
 trench: descend 10 depths, blast gloomjellies / fangdrifts / darters, collect the amber
 lumens they drop, fill the LANTERN meter to trigger a LUMEN SURGE, and face the segmented
