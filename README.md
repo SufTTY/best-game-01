@@ -53,12 +53,16 @@ and escalate their loadout as the match goes on.
 ## Layout
 
 ```
-game/        the playable game: static ES modules, no build step
-screenshots/ real in-browser captures taken by the maker
-tools/       headless capture + full-match probe (Node 22 stdlib, Chrome via CHROME_BIN)
-vendor/      make.fun threejs dossier library (unchanged kit copy)
-main.ts      the entry program: copies game/ + screenshots/ and writes dossier.json
-serve.ts     local static server: `node serve.ts`, then http://localhost:8080
+game/            the playable game: static ES modules, no build step
+game/src/        config.js (tuning) · util.js (seeded RNG) · input.js · audio.js (synth)
+                 map.js (walls, lanes, collision, rays) · nav.js (grid paths) · pawns.js
+                 squads.js (bot AI) · weapons.js · grenades.js · rounds.js (referee)
+                 hud.js · shop.js · main.js (boot, loop, shots)
+screenshots/     real in-browser captures taken by the maker
+tools/           headless capture + full-match probe (Node 22 stdlib, Chrome via CHROME_BIN)
+vendor/          make.fun dossier library (unchanged kit copy, vendor/makefun-game.ts)
+main.ts          the entry program: copies game/ + screenshots/ and writes dossier.json
+serve.ts         local static server: `node serve.ts`, then http://localhost:8080
 ```
 
 ## Running

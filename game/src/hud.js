@@ -1,7 +1,6 @@
-// The DOM HUD: crosshair with spread bloom, hit marker, health, armour, ammo, money, the
-// round score, round timer, objective status, roster dots, kill feed, banners and the one
-// overlay panel. It never touches the simulation; main.js pushes numbers in and reads the
-// play callback out.
+// The DOM HUD. It reads numbers pushed into it and never touches the simulation. One
+// panel, one banner, one kill feed: every player action answers back somewhere on screen.
+
 const COPY = {
   start: {
     title: 'BREACH LINE',
@@ -9,14 +8,14 @@ const COPY = {
     action: 'Click to play',
   },
   paused: {
-    title: 'BREACH LINE',
-    copy: 'Paused. Click to resume.',
+    title: 'PAUSED',
+    copy: 'The match waits. Click to resume.',
     action: 'Click to resume',
   },
   dead: {
     title: 'DOWN',
     copy: 'You went down this round. Your squad fights on — the next round buys you back in.',
-    action: 'Wait for the round',
+    action: 'Watch the round',
   },
   match: {
     title: 'MATCH OVER',
@@ -26,155 +25,91 @@ const COPY = {
 };
 
 export function createHud() {
-  const overlay = document.getElementById('overlay');
-  const title = document.getElementById('overlay-title');
-  const copy = document.getElementById('overlay-copy');
-  const play = document.getElementById('play');
-  const ammo = document.getElementById('ammo');
-  const ammoMag = document.getElementById('ammo-mag');
-  const ammoReserve = document.getElementById('ammo-reserve');
-  const ammoLabel = document.getElementById('ammo-label');
-  const moneyValue = document.getElementById('money-value');
-  const scoreCobalt = document.getElementById('score-cobalt');
-  const scoreEmber = document.getElementById('score-ember');
-  const timerValue = document.getElementById('timer-value');
-  const objective = document.getElementById('objective');
-  const roster = document.getElementById('roster');
-  const armorFill = document.getElementById('armor-fill');
-  const armorRow = document.getElementById('armor');
-  const healthFill = document.getElementById('health-fill');
-  const healthValue = document.getElementById('health-value');
-  const healthBar = document.getElementById('health');
-  const banner = document.getElementById('banner');
-  const bannerTitle = document.getElementById('banner-title');
-  const bannerSub = document.getElementById('banner-sub');
-  const feed = document.getElementById('feed');
-  const crosshair = document.getElementById('crosshair');
-  const vignette = document.getElementById('vignette');
-  const hitmarker = document.getElementById('hitmarker');
-  const weaponRow = document.getElementById('weapon-row');
-  const fragRow = document.getElementById('frag-row');
-  let hitTimer = 0;
+  const $ = (id) => document.getElementById(id);
+  const overlay = $('overlay'), title = $('overlay-title'), copy = $('overlay-copy'), play = $('play');
+  const ammoMag = $('ammo-mag'), ammoReserve = $('ammo-reserve'), ammoLabel = $('ammo-label');
+  const moneyValue = $('money-value'), scoreCobalt = $('score-cobalt'), scoreEmber = $('score-ember');
+  const timerValue = $('timer-value'), objective = $('objective'), roster = $('roster');
+  const armorRow = $('armor'), armorFill = $('armor-fill');
+  const healthFill = $('health-fill'), healthValue = $('health-value');
+  const banner = $('banner'), bannerTitle = $('banner-title'), bannerSub = $('banner-sub');
+  const feed = $('feed'), crosshair = $('crosshair'), hitmarker = $('hitmarker');
+  const vignette = $('vignette'), weaponRow = $('weapon-row'), fragRow = $('frag-row');
   let bannerTimer = 0;
-  let lastMag = -1;
-  let lastReserve = -1;
-  let lastHealth = -1;
-  let lastArmor = -1;
-  let lastMoney = -1;
-  let lastTimer = -1;
-  let lastScore = '';
+  let hitTimer = 0;
+  let rosterState = '';
 
-  function feedLine(text, accent) {
-    const line = document.createElement('div');
-    line.className = 'feed-line' + (accent ? ' accent' : '');
-    line.textContent = text;
-    feed.prepend(line);
-    while (feed.children.length > 4) feed.lastChild.remove();
-    setTimeout(() => { line.classList.add('fade'); }, 2600);
-    setTimeout(() => { line.remove(); }, 3200);
-  }
-
-  function setRoster(cobaltAlive, cobaltTotal, emberAlive, emberTotal) {
-    let html = '';
-    for (let index = 0; index < cobaltTotal; index += 1) {
-      html += `<span class="dot cobalt${index < cobaltAlive ? ' on' : ''}"></span>`;
-    }
-    html += '<span class="roster-gap"></span>';
-    for (let index = 0; index < emberTotal; index += 1) {
-      html += `<span class="dot ember${index < emberAlive ? ' on' : ''}"></span>`;
-    }
-    roster.innerHTML = html;
-  }
-
-  return {
-    feedLine,
-    clearFeed() {
-      feed.innerHTML = '';
+  const api = {
+    setAmmo(mag, reserve, weaponName) {
+      ammoMag.textContent = mag;
+      ammoReserve.textContent = ` / ${reserve}`;
+      ammoLabel.textContent = weaponName;
     },
-    setRoster,
-    setAmmo(mag, reserve, name) {
-      if (mag === lastMag && reserve === lastReserve) return;
-      lastMag = mag;
-      lastReserve = reserve;
-      ammoMag.textContent = String(mag);
-      ammoReserve.textContent = `/ ${reserve}`;
-      ammoLabel.textContent = name;
-      ammo.classList.toggle('empty', mag === 0);
-    },
-    setMoney(value) {
-      if (value === lastMoney) return;
-      lastMoney = value;
-      moneyValue.textContent = `$${value}`;
-    },
+    setWeapon(name) { weaponRow.textContent = name; },
+    setFrags(count) { fragRow.textContent = 'FRAGS ' + (count > 0 ? '·'.repeat(count) : '—'); },
+    setMoney(amount) { moneyValue.textContent = `$${amount}`; },
     setScore(cobalt, ember) {
-      const text = `${cobalt} : ${ember}`;
-      if (text === lastScore) return;
-      lastScore = text;
-      scoreCobalt.textContent = String(cobalt);
-      scoreEmber.textContent = String(ember);
+      scoreCobalt.textContent = cobalt;
+      scoreEmber.textContent = ember;
     },
-    setTimer(seconds) {
-      const rounded = Math.max(0, Math.ceil(seconds));
-      if (rounded === lastTimer) return;
-      lastTimer = rounded;
-      timerValue.textContent = `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, '0')}`;
+    setTimer(seconds, warn) {
+      const s = Math.max(0, Math.ceil(seconds));
+      timerValue.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+      timerValue.style.color = warn ? '#ff5533' : '';
     },
-    setObjective(text, warn = false) {
+    setObjective(text, warn) {
       objective.textContent = text;
-      objective.classList.toggle('warn', warn);
+      objective.classList.toggle('warn', !!warn);
     },
-    setWeaponRow(text) {
-      weaponRow.textContent = text;
+    setRoster(cobaltAlive, cobaltTotal, emberAlive, emberTotal) {
+      const key = `${cobaltAlive}/${cobaltTotal}/${emberAlive}/${emberTotal}`;
+      if (key === rosterState) return;
+      rosterState = key;
+      let html = '';
+      for (let i = 0; i < cobaltTotal; i += 1) html += `<span class="dot cobalt ${i < cobaltAlive ? 'on' : ''}"></span>`;
+      html += '<span class="roster-gap"></span>';
+      for (let i = 0; i < emberTotal; i += 1) html += `<span class="dot ember ${i < emberAlive ? 'on' : ''}"></span>`;
+      roster.innerHTML = html;
     },
-    setFrags(count) {
-      fragRow.textContent = `FRAGS ${'•'.repeat(count)}${'·'.repeat(Math.max(0, 2 - count))}`;
+    setHealth(health) {
+      healthFill.style.width = `${Math.max(0, health)}%`;
+      healthValue.textContent = Math.max(0, Math.round(health));
     },
-    setArmor(value) {
-      const rounded = Math.round(value);
-      if (rounded === lastArmor) return;
-      lastArmor = rounded;
-      armorRow.classList.toggle('hidden', rounded <= 0);
-      armorFill.style.width = `${Math.max(0, rounded)}%`;
+    setArmor(amount) {
+      armorRow.classList.toggle('hidden', !(amount > 0));
+      armorFill.style.width = `${Math.max(0, Math.min(100, amount))}%`;
     },
-    setHealth(value) {
-      const rounded = Math.round(value);
-      if (rounded === lastHealth) return;
-      lastHealth = rounded;
-      healthFill.style.width = `${Math.max(0, rounded)}%`;
-      healthValue.textContent = String(rounded);
-      healthBar.classList.toggle('low', rounded <= 30);
-      vignette.classList.toggle('hurt', rounded <= 30);
+    setSpread(degrees) {
+      crosshair.style.setProperty('--spread', `${0.4 + degrees * 0.09}em`);
     },
-    flashHurt() {
-      vignette.classList.remove('hit');
-      void vignette.offsetWidth;
-      vignette.classList.add('hit');
-      setTimeout(() => vignette.classList.remove('hit'), 220);
-    },
-    setSpread(scale) {
-      crosshair.style.setProperty('--spread', `${scale.toFixed(2)}em`);
-    },
-    hitMarker(killed, holdMs = 90) {
-      hitmarker.classList.add('on');
-      hitmarker.style.transform = killed ? 'translate(-50%, -50%) rotate(45deg) scale(1.3)' : '';
+    hitMarker(strong, ms) {
+      hitmarker.style.opacity = '1';
+      hitmarker.style.transform = `translate(-50%, -50%) scale(${strong ? 1.5 : 1})`;
       clearTimeout(hitTimer);
-      hitTimer = setTimeout(() => {
-        hitmarker.classList.remove('on');
-        hitmarker.style.transform = '';
-      }, holdMs);
+      hitTimer = setTimeout(() => { hitmarker.style.opacity = '0'; }, ms || 90);
     },
-    bannerShow(main, sub, holdMs = 2200) {
+    damageFlash(amount) {
+      vignette.style.opacity = String(Math.min(0.75, 0.25 + amount / 60));
+      setTimeout(() => { vignette.style.opacity = '0'; }, 180);
+    },
+    banner(main, sub, holdMs) {
       bannerTitle.textContent = main;
-      bannerSub.textContent = sub;
+      bannerSub.textContent = sub || '';
       banner.classList.add('on');
       clearTimeout(bannerTimer);
-      bannerTimer = setTimeout(() => banner.classList.remove('on'), holdMs);
+      bannerTimer = setTimeout(() => banner.classList.remove('on'), holdMs || 2400);
     },
-    hideBanner() {
-      clearTimeout(bannerTimer);
-      banner.classList.remove('on');
+    hideBanner() { clearTimeout(bannerTimer); banner.classList.remove('on'); },
+    feedLine(text, strong) {
+      const row = document.createElement('div');
+      row.className = 'feed-row' + (strong ? ' strong' : '');
+      row.textContent = text;
+      feed.appendChild(row);
+      while (feed.children.length > 5) feed.removeChild(feed.firstChild);
+      setTimeout(() => row.remove(), 4200);
     },
-    showOverlay(mode, detail = '') {
+    clearFeed() { feed.innerHTML = ''; },
+    showOverlay(mode, detail) {
       const text = COPY[mode];
       title.textContent = text.title;
       copy.textContent = detail || text.copy;
@@ -182,11 +117,9 @@ export function createHud() {
       overlay.hidden = false;
       play.focus();
     },
-    hideOverlay() {
-      overlay.hidden = true;
-    },
-    onPlay(handler) {
-      play.addEventListener('click', handler);
-    },
+    hideOverlay() { overlay.hidden = true; },
+    onPlay(handler) { play.addEventListener('click', handler); },
   };
+
+  return api;
 }

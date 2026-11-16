@@ -22,33 +22,27 @@
     #hud { position: fixed; inset: 0; pointer-events: none; user-select: none; }
 
     #crosshair { position: absolute; left: 50%; top: 50%; width: 0; height: 0; --spread: 1em; }
-    #crosshair span {
-      position: absolute; background: var(--ink); opacity: 0.9;
-      box-shadow: 0 0 2px rgba(0, 0, 0, 0.9);
-    }
+    #crosshair span { position: absolute; background: var(--ink); opacity: 0.9; box-shadow: 0 0 2px rgba(0, 0, 0, 0.9); }
     #crosshair .dot { width: 2px; height: 2px; left: -1px; top: -1px; }
     #crosshair .t { width: 2px; height: 0.5em; left: -1px; top: calc(-0.5em - var(--spread)); }
     #crosshair .b { width: 2px; height: 0.5em; left: -1px; top: var(--spread); }
     #crosshair .l { width: 0.5em; height: 2px; top: -1px; left: calc(-0.5em - var(--spread)); }
     #crosshair .r { width: 0.5em; height: 2px; top: -1px; left: var(--spread); }
 
-    #hitmarker {
-      position: absolute; left: 50%; top: 50%; width: 18px; height: 18px;
-      transform: translate(-50%, -50%); opacity: 0; transition: opacity 60ms;
-    }
-    #hitmarker::before, #hitmarker::after {
-      content: ''; position: absolute; background: var(--accent); box-shadow: 0 0 3px rgba(0,0,0,0.8);
-    }
+    #hitmarker { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; transform: translate(-50%, -50%); opacity: 0; transition: opacity 60ms; }
+    #hitmarker::before, #hitmarker::after { content: ''; position: absolute; background: var(--accent); box-shadow: 0 0 3px rgba(0, 0, 0, 0.8); }
     #hitmarker::before { left: 8px; top: 0; width: 2px; height: 18px; }
     #hitmarker::after { left: 0; top: 8px; width: 18px; height: 2px; }
-    #hitmarker.on { opacity: 1; }
+
+    #vignette { position: absolute; inset: 0; opacity: 0; transition: opacity 160ms; pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(150, 20, 20, 0.85) 100%); }
 
     #topbar { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); text-align: center; }
-    #scoreboard { display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+    #scoreboard { display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 700; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
     #score-cobalt { color: var(--cobalt); }
     #score-ember { color: var(--ember); }
-    #score-mid { color: var(--muted); font-size: 16px; }
-    #timer-value { margin-top: 2px; font-size: 15px; letter-spacing: 0.1em; color: var(--ink); }
+    #score-mid { color: var(--muted); font-size: 14px; letter-spacing: 0.2em; }
+    #timer-value { margin-top: 2px; font-size: 15px; letter-spacing: 0.1em; }
     #objective { margin-top: 2px; font-size: 11px; letter-spacing: 0.18em; color: var(--muted); }
     #objective.warn { color: #ff5533; }
     #roster { margin-top: 6px; display: flex; gap: 5px; align-items: center; justify-content: center; }
@@ -58,82 +52,56 @@
     #roster .dot.on { opacity: 1; }
     #roster .roster-gap { width: 12px; }
 
-    #feed { position: absolute; right: 28px; top: 24px; text-align: right; font-size: 12.5px; }
-    .feed-line { color: var(--ink); opacity: 0.95; margin-bottom: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.9); transition: opacity 600ms; }
-    .feed-line.accent { color: var(--accent); }
-    .feed-line.fade { opacity: 0; }
+    #feed { position: absolute; top: 96px; right: 22px; display: grid; gap: 4px; justify-items: end; font-size: 12px; }
+    .feed-row { padding: 3px 8px; background: rgba(20, 23, 28, 0.7); border-left: 2px solid var(--hairline); color: var(--muted); }
+    .feed-row.strong { color: var(--ink); border-left-color: var(--accent); }
 
-    #money { position: absolute; left: 28px; top: 24px; font-size: 22px; font-weight: 700; color: var(--accent); text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-    #money-label { font-size: 10px; letter-spacing: 0.18em; color: var(--muted); }
-    #weapon-row { margin-top: 6px; font-size: 11px; letter-spacing: 0.14em; color: var(--ink); }
-    #frag-row { margin-top: 4px; font-size: 11px; letter-spacing: 0.14em; color: var(--muted); }
+    #money { position: absolute; top: 18px; left: 22px; }
+    #money-value { font-size: 22px; font-weight: 700; color: var(--accent); }
+    #money-label, #weapon-row, #frag-row { font-size: 10px; letter-spacing: 0.16em; color: var(--muted); margin-top: 2px; }
+    #weapon-row { color: var(--ink); margin-top: 8px; }
 
-    #vitals { position: absolute; left: 28px; bottom: 26px; width: 240px; }
-    #armor { height: 6px; background: rgba(20, 22, 26, 0.75); border: 1px solid var(--hairline); margin-bottom: 5px; }
-    #armor.hidden { visibility: hidden; }
-    #armor-fill { height: 100%; width: 100%; background: var(--cobalt); transition: width 140ms ease; }
-    #health { height: 10px; background: rgba(20, 22, 26, 0.75); border: 1px solid var(--hairline); }
-    #health-fill { height: 100%; width: 100%; background: var(--ink); transition: width 140ms ease; }
-    #health.low #health-fill { background: #d4483b; }
-    #health-label { margin-top: 6px; font-size: 12px; letter-spacing: 0.12em; color: var(--muted); display: flex; justify-content: space-between; }
-    #health-value { color: var(--ink); }
+    #vitals { position: absolute; left: 22px; bottom: 26px; width: 260px; }
+    #armor { height: 4px; background: var(--surface); margin-bottom: 4px; }
+    #armor.hidden { display: none; }
+    #armor-fill { height: 100%; width: 0; background: var(--cobalt); }
+    #health { height: 6px; background: var(--surface); }
+    #health-fill { height: 100%; width: 100%; background: var(--ink); transition: width 120ms; }
+    #health-label { display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; letter-spacing: 0.18em; color: var(--muted); }
 
-    #ammo { position: absolute; right: 28px; bottom: 26px; text-align: right; }
-    #ammo-mag { font-size: 34px; font-weight: 700; }
-    #ammo-reserve { font-size: 15px; color: var(--muted); }
-    #ammo.empty #ammo-mag { color: #d4483b; }
-    #ammo-label { font-size: 11px; letter-spacing: 0.14em; color: var(--muted); }
+    #ammo { position: absolute; right: 22px; bottom: 26px; text-align: right; font-size: 26px; font-weight: 700; }
+    #ammo-reserve { font-size: 14px; color: var(--muted); font-weight: 400; }
+    #ammo-label { font-size: 10px; letter-spacing: 0.16em; color: var(--muted); font-weight: 400; margin-top: 2px; }
 
-    #banner {
-      position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) scale(0.92);
-      text-align: center; opacity: 0; transition: opacity 200ms ease, transform 200ms ease;
-    }
-    #banner.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    #banner-title { font-size: 42px; font-weight: 800; letter-spacing: 0.2em; color: var(--accent); text-shadow: 0 2px 10px rgba(0,0,0,0.85); }
-    #banner-sub { margin-top: 6px; font-size: 14px; letter-spacing: 0.12em; color: var(--ink); text-shadow: 0 1px 4px rgba(0,0,0,0.85); }
+    #banner { position: absolute; left: 50%; top: 34%; transform: translateX(-50%); text-align: center; opacity: 0; transition: opacity 200ms; }
+    #banner.on { opacity: 1; }
+    #banner-title { font-size: 26px; font-weight: 800; letter-spacing: 0.16em; color: var(--ink); text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); }
+    #banner-sub { margin-top: 6px; font-size: 12px; letter-spacing: 0.14em; color: var(--muted); }
 
-    #vignette { position: absolute; inset: 0; opacity: 0; transition: opacity 240ms; }
-    #vignette.hurt { box-shadow: inset 0 0 140px rgba(212, 72, 59, 0.45); opacity: 1; }
-    #vignette.hit { box-shadow: inset 0 0 90px rgba(212, 72, 59, 0.6); opacity: 1; transition: none; }
-
-    /* Buy menu: bottom-left panel, keys 2-6 buy. */
-    #buy {
-      position: absolute; left: 28px; bottom: 120px; width: 260px;
-      background: rgba(18, 20, 25, 0.92); border: 1px solid var(--hairline); padding: 10px;
-    }
+    #buy { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 320px; pointer-events: auto;
+      background: rgba(24, 27, 33, 0.94); border: 1px solid var(--hairline); padding: 14px; }
     #buy[hidden] { display: none; }
-    #buy-title { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.16em; color: var(--muted); margin-bottom: 8px; }
+    #buy-title { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 10px; }
     #buy-money { color: var(--accent); }
-    .buy-row {
-      display: flex; width: 100%; align-items: center; gap: 10px; padding: 6px 8px; margin-bottom: 4px;
-      font: inherit; font-size: 12px; color: var(--ink); background: var(--surface);
-      border: 1px solid var(--hairline); cursor: pointer; pointer-events: auto;
-    }
-    .buy-row:hover { filter: brightness(1.15); }
-    .buy-row.too-poor { opacity: 0.45; }
-    .buy-key { color: var(--accent); min-width: 14px; }
-    .buy-name { flex: 1; text-align: left; letter-spacing: 0.08em; }
-    .buy-price { color: var(--muted); }
+    .buy-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 8px; background: none; border: none;
+      border-bottom: 1px solid rgba(58, 68, 80, 0.5); color: var(--ink); font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
+    .buy-row:hover { background: rgba(63, 155, 143, 0.12); }
+    .buy-row.too-poor { opacity: 0.35; }
+    .buy-key { width: 16px; color: var(--muted); }
+    .buy-name { flex: 1; letter-spacing: 0.08em; }
+    .buy-price { color: var(--accent); }
 
-    /* Overlay panel: start / paused / match end. */
-    #overlay {
-      position: fixed; inset: 0; display: grid; place-items: center;
-      background: rgba(12, 13, 16, 0.72); backdrop-filter: blur(3px); pointer-events: auto;
-    }
+    #overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(12, 13, 16, 0.72); backdrop-filter: blur(3px); }
     #overlay[hidden] { display: none; }
-    #panel { text-align: center; max-width: 500px; padding: 32px; }
+    #panel { text-align: center; max-width: 520px; padding: 32px; }
     #overlay-title { font-size: 44px; font-weight: 800; letter-spacing: 0.22em; color: var(--accent); }
     #overlay-copy { margin: 14px 0 22px; font-size: 14px; line-height: 1.6; color: var(--muted); }
-    #play {
-      font: inherit; font-size: 15px; letter-spacing: 0.1em; padding: 12px 34px; cursor: pointer;
-      color: var(--canvas); background: var(--accent); border: none; border-radius: 2px;
-    }
+    #play { font: inherit; font-size: 15px; letter-spacing: 0.1em; padding: 12px 34px; cursor: pointer;
+      color: var(--canvas); background: var(--accent); border: none; border-radius: 2px; }
     #play:hover { filter: brightness(1.1); }
     .keys { margin-top: 26px; list-style: none; display: grid; grid-template-columns: repeat(3, auto); gap: 8px 22px; justify-content: center; font-size: 12px; color: var(--muted); }
-    .keys kbd {
-      display: inline-block; min-width: 20px; padding: 2px 6px; margin-right: 4px; text-align: center;
-      border: 1px solid var(--hairline); border-radius: 3px; background: var(--surface); color: var(--ink); font: inherit; font-size: 11px;
-    }
+    .keys kbd { display: inline-block; min-width: 20px; padding: 2px 6px; margin-right: 4px; text-align: center;
+      border: 1px solid var(--hairline); border-radius: 3px; background: var(--surface); color: var(--ink); font: inherit; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -161,7 +129,7 @@
       <div id="money-value">$800</div>
       <div id="money-label">FUNDS</div>
       <div id="weapon-row">P-9 SERVICE</div>
-      <div id="frag-row">FRAGS ··</div>
+      <div id="frag-row">FRAGS —</div>
     </div>
 
     <div id="vitals">
