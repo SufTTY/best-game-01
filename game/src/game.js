@@ -9,7 +9,7 @@ export class Game {
     this.enemies = []; this.bullets = []; this.lumens = [];
     this.shots = [];
     this.warden = null; this.wave = 0; this.spawnT = 0; this.depthDone = false;
-    this.onEvent = null; this.onBurst = null;
+    this.onEvent = null; this.onBurst = null; this.onPop = null;
   }
   startDepth(d) {
     G.depth = d;
@@ -98,7 +98,9 @@ export class Game {
     this.enemies.splice(j, 1);
     G.combo++; G.comboT = 3;
     const mult = G.surge > 0 ? 2 : 1;
-    G.score += 10 * mult * Math.max(1, G.combo);
+    const gained = 10 * mult * Math.max(1, G.combo);
+    G.score += gained;
+    this.onPop && this.onPop(e.x, e.y - 18, `+${gained} x${G.combo}`, '#ffe259');
     this.onBurst && this.onBurst(e.x, e.y, '#ff5ce0', 14, 220);
     this.lumens.push(new Lumen(e.x, e.y));
     if (e.kind === 'jelly') this.lumens.push(new Lumen(e.x + rand(-24, 24), e.y + rand(-24, 24)));
@@ -110,6 +112,7 @@ export class Game {
         this.lumens.splice(i, 1);
         G.lantern += 12;
         G.score += 5 * (G.surge > 0 ? 2 : 1);
+        this.onPop && this.onPop(l.x, l.y - 12, '+5', '#ffc766');
         this.audio.pickup();
         if (G.lantern >= LANTERN_MAX && G.surge <= 0) {
           G.lantern = 0; G.surge = SURGE_TIME;

@@ -32,6 +32,7 @@ function glowText(ctx, text, x, y, size, color, alpha = 1) {
 }
 
 export function drawTitle(ctx, W, H, t) {
+  ctx.fillStyle = 'rgba(2,4,10,0.45)'; ctx.fillRect(0, 0, W, H);
   const pulse = 0.7 + 0.3 * Math.sin(t * 2);
   glowText(ctx, 'DEEPGLOW', W / 2, 260, 84, '#2ee6c8', pulse);
   glowText(ctx, 'salvage the light, survive the trench', W / 2, 320, 20, '#7fd8ff', 0.9);

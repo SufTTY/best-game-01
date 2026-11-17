@@ -50,12 +50,24 @@ export class Player {
     if (this.inv > 0 && Math.floor(this.inv * 12) % 2 === 0) return;
     ctx.save();
     ctx.translate(this.x, this.y); ctx.rotate(this.aim + Math.PI / 2);
+    const hl = ctx.createLinearGradient(0, -18, 0, -148);
+    hl.addColorStop(0, 'rgba(160,255,230,0.30)'); hl.addColorStop(1, 'rgba(160,255,230,0)');
+    ctx.fillStyle = hl;
+    ctx.beginPath();
+    ctx.moveTo(0, -18); ctx.lineTo(46, -148); ctx.lineTo(-46, -148);
+    ctx.closePath(); ctx.fill();
+    const fl = 12 + Math.sin(G.time * 24) * 5;
+    const fg = ctx.createLinearGradient(0, 10, 0, 12 + fl);
+    fg.addColorStop(0, 'rgba(140,255,235,0.85)'); fg.addColorStop(1, 'rgba(140,255,235,0)');
+    ctx.fillStyle = fg;
+    ctx.beginPath(); ctx.moveTo(-5, 10); ctx.lineTo(5, 10); ctx.lineTo(0, 12 + fl); ctx.closePath(); ctx.fill();
     ctx.shadowBlur = 24; ctx.shadowColor = '#2ee6c8';
     ctx.fillStyle = this.flash > 0 ? '#ffffff' : '#3ff5d8';
     ctx.beginPath();
     ctx.moveTo(0, -18); ctx.lineTo(11, 12); ctx.lineTo(0, 6); ctx.lineTo(-11, 12);
     ctx.closePath(); ctx.fill();
     ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(220,255,248,0.55)'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = '#dffff8';
     ctx.beginPath(); ctx.arc(0, -4, 4.5, 0, 6.29); ctx.fill();
     ctx.restore();
@@ -140,9 +152,16 @@ export class Enemy {
   draw(ctx) {
     ctx.save(); ctx.translate(this.x, this.y);
     if (this.kind === 'jelly') {
+      const r = this.r + Math.sin(G.time * 4 + this.t) * 1.5;
+      const bg = ctx.createRadialGradient(0, -r * 0.35, r * 0.15, 0, 0, r * 1.15);
+      bg.addColorStop(0, 'rgba(255,190,240,0.95)');
+      bg.addColorStop(0.55, 'rgba(255,92,224,0.85)');
+      bg.addColorStop(1, 'rgba(120,10,90,0.85)');
       ctx.shadowBlur = 18; ctx.shadowColor = '#ff4fd8';
-      ctx.fillStyle = '#ff5ce0';
-      ctx.beginPath(); ctx.arc(0, 0, this.r, Math.PI, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = bg;
+      ctx.beginPath(); ctx.arc(0, 0, r, Math.PI, 0); ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255,170,235,0.8)'; ctx.lineWidth = 2; ctx.stroke();
       ctx.strokeStyle = '#ff9aea'; ctx.lineWidth = 2;
       for (let i = -1; i <= 1; i++) {
         ctx.beginPath(); ctx.moveTo(i * 8, 0);

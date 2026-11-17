@@ -1,11 +1,12 @@
 import { rand } from './config.js';
 
 export class Particles {
-  constructor() { this.list = []; this.spores = []; }
+  constructor() { this.list = []; this.spores = []; this.pops = []; }
   initSpores(n) {
     this.spores = [];
     for (let i = 0; i < n; i++) this.spores.push({ x: rand(0, 1280), y: rand(0, 800), r: rand(1, 3), s: rand(4, 18), a: rand(0.15, 0.5), ph: rand(0, 6.28) });
   }
+  pop(x, y, text, color) { this.pops.push({ x, y, text, color, life: 0.9, max: 0.9 }); }
   burst(x, y, color, n, spd = 180, life = 0.6) {
     for (let i = 0; i < n; i++) {
       const a = rand(0, Math.PI * 2), v = rand(spd * 0.3, spd);
@@ -24,6 +25,11 @@ export class Particles {
       p.x += p.vx * dt; p.y += p.vy * dt;
       p.vx *= 0.96; p.vy *= 0.96;
     }
+    for (let i = this.pops.length - 1; i >= 0; i--) {
+      const p = this.pops[i];
+      p.life -= dt; p.y -= 40 * dt;
+      if (p.life <= 0) { this.pops.splice(i, 1); continue; }
+    }
   }
   draw(ctx) {
     for (const s of this.spores) {
@@ -38,5 +44,14 @@ export class Particles {
       ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.29); ctx.fill();
     }
     ctx.globalAlpha = 1;
+    for (const p of this.pops) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max);
+      ctx.font = 'bold 15px monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+      ctx.fillStyle = p.color;
+      ctx.fillText(p.text, p.x, p.y);
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
   }
 }
