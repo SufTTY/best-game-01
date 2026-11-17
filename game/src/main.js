@@ -17,7 +17,6 @@ parts.initSpores(70);
 const world = new World();
 const game = new Game(audio);
 game.onBurst = (x, y, c, n, s) => parts.burst(x, y, c, n, s);
-game.onPop = (x, y, text, color) => parts.pop(x, y, text, color);
 game.onEvent = (ev) => {
   if (ev === 'dead') { G.state = 'over'; }
   if (ev === 'win') { G.state = 'win'; }
@@ -79,11 +78,7 @@ function banner(text, color) { G.banner = { text, color, alpha: 1 }; G.bannerT =
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  if (G.state === 'title') {
-    render(ctx, W, H, world, game.pl, game.enemies, game.bullets, game.lumens, game.shots, null, parts);
-    drawTitle(ctx, W, H, G.time);
-    return;
-  }
+  if (G.state === 'title') { drawTitle(ctx, W, H, G.time); return; }
   render(ctx, W, H, world, game.pl, game.enemies, game.bullets, game.lumens, game.shots, game.warden, parts);
   drawHUD(ctx, W, H, game.pl, G.banner);
   if (game.warden && !game.warden.dead) game.warden.drawBar(ctx, W);
